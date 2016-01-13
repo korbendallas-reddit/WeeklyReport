@@ -269,7 +269,7 @@ def submit_report(r):
 
 
     #Submit Report
-    post_title = 'Weekly Report for /r/' + subname + ' - ' + str(time.strftime('%A, %B %d, %Y', time.gmtime(float(submission.created_utc))))
+    post_title = 'Weekly Report for /r/' + subname + ' - ' + str(time.strftime('%A, %B %d, %Y', time.gmtime())) 
     r.submit(post_to_sub, post_title, text='\r\n\r\n'.join(report_text))
     
             
