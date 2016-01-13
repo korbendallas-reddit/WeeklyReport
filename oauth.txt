@@ -1,0 +1,12 @@
+# Config
+scope=account,read,report,wikiedit,wikiread,modposts,modcontributors,modself,privatemessages
+refreshable=True
+
+# Appinfo
+app_key=Fill this out
+app_secret=This too
+
+
+# Token
+token=None
+refresh_token=None
