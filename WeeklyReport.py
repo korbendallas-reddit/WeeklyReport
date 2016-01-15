@@ -1,4 +1,5 @@
-import string, praw, OAuth2Util, time
+# -*- coding: cp1252 -*-
+import string, praw, OAuth2Util, time, datetime, locale
 from operator import itemgetter
 
 
@@ -10,30 +11,36 @@ username = '_korbendallas_'
 user_agent = '_korbendallas_ by /u/_korbendallas_ ver 0.1'
 
 
-#Global Variables
+#Global Submission Variables
 submission_data = [] #Submission_Title, Submission_Author, Submission_Short_Link, Submission_Score, Submission_Short_Link, Submission_Created_Epoch, Submission_Created_GMT
 top_submissions = ['Score|Author|Post Title', ':---|:---|:---']
+gilded_submissions = ['Score|Author|Post Title|Gilded', ':---|:---|:---|:---']
 submission_authors = [] #Total_Score, Author, Count
 total_submission_count = 0
 top_submission_authors = ['Author|Total Score|Submission Count|Submission Average', ':---|:---|:---|:---']
 total_submission_authors = 0
-    
-comment_data = []
+
+#Global Comment Variables    
+comment_data = [] #Comment_Author, Comment_Score, Comment_Link, Submission_Title
 top_comments = ['Score|Author|Comment', ':---|:---|:---']
+gilded_comments = ['Score|Author|Comment|Gilded', ':---|:---|:---|:---']
 comment_authors = [] #Total_Score, Author, Count
-total_comment_count = 0 #Comment_Body, Comment_Author, Comment_Score, Comment_Link, Submission_Title
+total_comment_count = 0
 top_comment_authors = ['Author|Total Score|Comment Count|Comment Average', ':---|:---|:---|:---']
 total_comment_authors = 0
 
 
     
-def Main():    
+def Main():
+
+    locale.setlocale(locale.LC_ALL, '') #Python 2.x non-ascii
 
     #Login
     r = praw.Reddit(user_agent)
     o = OAuth2Util.praw.AuthenticatedReddit.login(r, disable_warning=True)
     sub = r.get_subreddit(subname)
 
+    #Do Things
     gather_data(r, sub)
     process_submission_data()
     process_comment_data()
@@ -48,7 +55,9 @@ def gather_data(r, sub):
     print 'Gathering Data'
 
     global submission_data
+    global gilded_submissions
     global comment_data
+    global gilded_comments
 
     #Gather submissions from the week
     submissions = sub.get_top_from_week(limit=None)
@@ -64,15 +73,19 @@ def gather_data(r, sub):
 
                 submission_data_row = []
 
-                submission_data_row.append(str(submission.title))  #Submission_Title
-                submission_data_row.append('/u/' + str(submission.author.name))  #Submission_Author
-                submission_data_row.append(str(submission.short_link))  #Submission_Short_Link
-                submission_data_row.append(int(submission.score))  #Submission_Score
-                submission_data_row.append(str(submission.short_link))  #Submission_Short_Link
-                submission_data_row.append(float(submission.created_utc))  #Submission_Created_Epoch
-                submission_data_row.append(str(time.strftime('%m/%d/%Y %H:%M:%S', time.gmtime(float(submission.created_utc)))))  #Submission_Created_GMT
+                submission_data_row.append(submission.title) #Submission_Title
+                submission_data_row.append('/u/' + submission.author.name) #Submission_Author
+                submission_data_row.append(submission.short_link) #Submission_Short_Link
+                submission_data_row.append(int(submission.score)) #Submission_Score
+                submission_data_row.append(submission.short_link) #Submission_Short_Link
+                submission_data_row.append(float(submission.created_utc)) #Submission_Created_Epoch
+                submission_data_row.append(str(time.strftime('%m/%d/%Y %H:%M:%S', time.gmtime(float(submission.created_utc))))) #Submission_Created_GMT
 
                 submission_data.append(submission_data_row)
+
+                #Add gilded submissions to list
+                if submission.gilded > 0:
+                    gilded_submissions.append(str(submission.score) + '|/u/' + submission.author.name + '|[' + submission.title + '](' + submission.short_link + ')|' + str(submission.gilded) + 'X')
                 
 
                 #Get the comments
@@ -92,22 +105,25 @@ def gather_data(r, sub):
 
                                 comment_data_row = []
 
-                                comment_data_row.append(string.replace(string.replace(str(comment.body), '\r', ' '), '\n', ' '))  #Comment_Body
-                                comment_data_row.append('/u/' + str(comment.author.name))  #Comment_Author
-                                comment_data_row.append(int(comment.score))  #Comment_Score
-                                comment_data_row.append(str(comment.permalink))  #Comment_Link
-                                comment_data_row.append(str(submission.title))  #Submission_Title
+                                comment_data_row.append('/u/' + comment.author.name) #Comment_Author
+                                comment_data_row.append(int(comment.score)) #Comment_Score
+                                comment_data_row.append(comment.permalink) #Comment_Link
+                                comment_data_row.append(submission.title) #Submission_Title
 
                                 comment_data.append(comment_data_row)
+
+                                #Add gilded submissions to list
+                                if comment.gilded > 0:
+                                    gilded_comments.append(str(comment.score) + '|/u/' + comment.author.name + '|[' + submission.title + '](' + submission.short_link + ')|' + str(comment.gilded) + 'X')
 
 
                         except (Exception) as e:
 
-                            print e.message
+                            print e
 
         except (Exception) as e:
 
-            print e.message
+            print e
 
 
     return
@@ -133,7 +149,7 @@ def process_submission_data():
         
         #Create Top 25 Submission Table
         if len(top_submissions) < 28:
-            top_submissions.append(str(submission_data_row[3]) + '|' + submission_data_row[1] + '|[' + submission_data_row[0] + '](' + submission_data_row[2] + ')')
+            top_submissions.append(str(submission_data_row[3]) + '|' + str(submission_data_row[1]) + '|[' + submission_data_row[0] + '](' + submission_data_row[2] + ')')
             
         #Compile Top Submission Author Scores
         if submission_authors:
@@ -151,7 +167,7 @@ def process_submission_data():
     for submission_author in submission_authors:
         total_submission_authors += 1
         if len(top_submission_authors) < 28:
-            top_submission_authors.append(submission_author[1] + '|' + str(submission_author[0]) + '|' + str(submission_author[2]) + '|' + str(float(submission_author[0]) / float(submission_author[2])))
+            top_submission_authors.append(submission_author[1] + '|' + str(submission_author[0]) + '|' + str(submission_author[2]) + '|' + str(int(float(submission_author[0]) / float(submission_author[2]))))
         else:
             break
 
@@ -170,7 +186,7 @@ def process_comment_data():
     global top_comment_authors
     global total_comment_authors
     
-    comment_data = reversed(sorted(comment_data, key=itemgetter(2)))
+    comment_data = reversed(sorted(comment_data, key=itemgetter(1)))
 
     for comment_data_row in comment_data:
 
@@ -178,17 +194,17 @@ def process_comment_data():
 
         #Create Top 25 Comments Table
         if len(top_comments) < 28:
-            top_comments.append(str(comment_data_row[2]) + '|' + comment_data_row[1] + '|[' + comment_data_row[4] + '](' + comment_data_row[3] + '?context=1000)')
+            top_comments.append(str(comment_data_row[1]) + '|' + str(comment_data_row[0]) + '|[' + comment_data_row[3] + '](' + comment_data_row[2] + '?context=1000)')
 
         #Compile Top Comment Author Scores
         if comment_authors:
             if comment_data_row[1] in [comment_authors_row[1] for comment_authors_row in comment_authors]:
-                comment_authors[[comment_authors_row[1] for comment_authors_row in comment_authors].index(comment_data_row[1])][0] += comment_data_row[2]
-                comment_authors[[comment_authors_row[1] for comment_authors_row in comment_authors].index(comment_data_row[1])][2] += 1
+                comment_authors[[comment_authors_row[1] for comment_authors_row in comment_authors].index(comment_data_row[0])][0] += comment_data_row[1]
+                comment_authors[[comment_authors_row[1] for comment_authors_row in comment_authors].index(comment_data_row[0])][2] += 1
             else:
-                comment_authors.append([comment_data_row[2], comment_data_row[1], 1])
+                comment_authors.append([comment_data_row[1], comment_data_row[0], 1])
         else:
-            comment_authors.append([comment_data_row[2], comment_data_row[1], 1])
+            comment_authors.append([comment_data_row[1], comment_data_row[0], 1])
 
     #Compile Top Comment Author Table
     comment_authors = reversed(sorted(comment_authors, key=itemgetter(0)))
@@ -196,7 +212,7 @@ def process_comment_data():
     for comment_author in comment_authors:
         total_comment_authors += 1
         if len(top_comment_authors) < 28:
-            top_comment_authors.append(comment_author[1] + '|' + str(comment_author[0]) + '|' + str(comment_author[2]) + '|' + str(float(comment_author[0]) / float(comment_author[2])))
+            top_comment_authors.append(comment_author[1] + '|' + str(comment_author[0]) + '|' + str(comment_author[2]) + '|' + str(int(float(comment_author[0]) / float(comment_author[2]))))
 
 
     return
@@ -211,6 +227,7 @@ def submit_report(r):
 
     global submission_data
     global top_submissions
+    global gilded_submissions
     global submission_authors
     global total_submission_count
     global top_submission_authors
@@ -218,6 +235,7 @@ def submit_report(r):
 
     global comment_data
     global top_comments
+    global gilded_comments
     global comment_authors
     global total_comment_count
     global top_comment_authors
@@ -225,6 +243,7 @@ def submit_report(r):
 
 
     report_text = ['#Weekly Report for /r/' + subname]
+    report_text.append(str(time.strftime('%A, %B %d, %Y', (datetime.datetime.now() + datetime.timedelta(days=-7)).timetuple())) + '  -  ' + str(time.strftime('%A, %B %d, %Y', time.gmtime())))
     report_text.append('---')
 
     report_text.append('---')
@@ -236,12 +255,18 @@ def submit_report(r):
     report_text.append('Total Submission Authors: ' + str(total_submission_authors))
     report_text.append('---')
 
-    report_text.append('###Top 25 Submissions')
+    report_text.append('##Top 25 Submissions')
     report_text.append('\r\n'.join(top_submissions))
     report_text.append('---')
 
-    report_text.append('###Top 25 Submitters')
+    report_text.append('##Top 25 Submitters')
     report_text.append('\r\n'.join(top_submission_authors))
+    report_text.append('---')
+
+    report_text.append('---')
+    report_text.append(str(len(gilded_submissions) - 2) + ' Gilded Submissions')
+    if len(gilded_submissions) > 2:
+        report_text.append('\r\n'.join(gilded_submissions))
     report_text.append('---')
 
 
@@ -254,12 +279,18 @@ def submit_report(r):
     report_text.append('Total Comment Authors: ' + str(total_comment_authors))
     report_text.append('---')
     
-    report_text.append('###Top 25 Comments')
+    report_text.append('##Top 25 Comments')
     report_text.append('\r\n'.join(top_comments))
     report_text.append('---')
 
-    report_text.append('###Top 25 Commenters')
+    report_text.append('##Top 25 Commenters')
     report_text.append('\r\n'.join(top_comment_authors))
+    report_text.append('---')
+
+    report_text.append('---')
+    report_text.append(str(len(gilded_comments) - 2) + ' Gilded Comments')
+    if len(gilded_comments) > 2:
+        report_text.append('\r\n'.join(gilded_comments))
     report_text.append('---')
     
     
@@ -269,8 +300,9 @@ def submit_report(r):
 
 
     #Submit Report
-    post_title = 'Weekly Report for /r/' + subname + ' - ' + str(time.strftime('%A, %B %d, %Y', time.gmtime())) 
+    post_title = 'Weekly Report for /r/' + subname + ' - ' + str(time.strftime('%A, %B %d, %Y', time.gmtime()))
     r.submit(post_to_sub, post_title, text='\r\n\r\n'.join(report_text))
+    r.submit('WeeklyReport', post_title, text='\r\n\r\n'.join(report_text))
     
             
     return
