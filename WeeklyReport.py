@@ -5,10 +5,10 @@ from operator import itemgetter
 
 
 #Variables to Change
-subname = 'photoshopbattles' #Subreddit to gather data from
-post_to_sub = 'battletalk' #Subreddit to post report to
-username = '_korbendallas_'
-user_agent = '_korbendallas_ by /u/_korbendallas_ ver 0.1'
+subname = 'CHANGETHIS' #Subreddit to gather data from
+post_to_sub = 'CHANGETHIS' #Subreddit to post report to
+username = 'CHANGETHIS'
+user_agent = 'CHANGETHIS'
 
 
 #Global Submission Variables
@@ -302,7 +302,7 @@ def submit_report(r):
     #Submit Report
     post_title = 'Weekly Report for /r/' + subname + ' - ' + str(time.strftime('%A, %B %d, %Y', time.gmtime()))
     r.submit(post_to_sub, post_title, text='\r\n\r\n'.join(report_text))
-    r.submit('WeeklyReport', post_title, text='\r\n\r\n'.join(report_text))
+    #r.submit('CHANGETHIS', post_title, text='\r\n\r\n'.join(report_text))
     
             
     return
