@@ -5,8 +5,43 @@ from operator import itemgetter
 
 
 #Variables to Change
-subname = 'CHANGETHIS' #Subreddit to gather data from
+subs = [['photoshopbattles', 'battletalk'],
+            ['MilitaryGfys', 'korbendallas'],
+            ['Yogscast', 'Fonjask'], ['mma', 'xniklasx'],
+            ['OutOfTheLoop', 'korbendallas'], ['shouldibuythisgame', 'emnii'],
+            ['runescape', 'korbendallas'], ['2007scape', 'korbendallas'],
+            ['RSDarkscape', 'korbendallas'], ['drama', 'korbendallas'],
+            ['WarshipPorn', 'korbendallas']]
+
+default_subs = [['Art', 'korbendallas'], ['AskReddit', 'korbendallas'],
+            ['askscience', 'korbendallas'], ['aww', 'korbendallas'],
+            ['books', 'korbendallas'], ['creepy', 'korbendallas'],
+            ['dataisbeautiful', 'korbendallas'], ['DIY', 'korbendallas'],
+            ['Documentaries', 'korbendallas'], ['EarthPorn', 'korbendallas'],
+            ['explainlikeimfive', 'korbendallas'], ['Fitness', 'korbendallas'],
+            ['food', 'korbendallas'], ['funny', 'korbendallas'],
+            ['Futurology', 'korbendallas'], ['gadgets', 'korbendallas'],
+            ['gaming', 'korbendallas'], ['GetMotivated', 'korbendallas'],
+            ['gifs', 'korbendallas'], ['history'],
+            ['IAmA', 'korbendallas'], ['InternetIsBeautiful', 'korbendallas'],
+            ['Jokes', 'korbendallas'], ['LifeProTips', 'korbendallas'],
+            ['listentothis', 'korbendallas'], ['mildlyinteresting', 'korbendallas'],
+            ['movies', 'korbendallas'], ['Music', 'korbendallas'],
+            ['news', 'korbendallas'], ['nosleep', 'korbendallas'],
+            ['nottheonion', 'korbendallas'], ['OldSchoolCool', 'korbendallas'],
+            ['personalfinance', 'korbendallas'], ['philosophy', 'korbendallas'],
+            ['photoshopbattles', 'korbendallas'], ['pics', 'korbendallas'],
+            ['science', 'korbendallas'], ['Showerthoughts', 'korbendallas'],
+            ['space', 'korbendallas'], ['sports', 'korbendallas'],
+            ['television', 'korbendallas'], ['tifu', 'korbendallas'],
+            ['todayilearned', 'korbendallas'], ['TwoXChromosomes', 'korbendallas'],
+            ['UpliftingNews', 'korbendallas'], ['videos', 'korbendallas'],
+            ['worldnews', 'korbendallas'], ['WritingPrompts']]
+
+
+subname = 'CHANGETHIS' #Current Subreddit
 post_to_sub = 'CHANGETHIS' #Subreddit to post report to
+
 username = 'CHANGETHIS'
 user_agent = 'CHANGETHIS'
 
@@ -35,16 +70,60 @@ def Main():
 
     locale.setlocale(locale.LC_ALL, '') #Python 2.x non-ascii
 
+    global subs
+    global default_subs
+    global subname
+    global post_to_sub
+    
+
     #Login
     r = praw.Reddit(user_agent)
     o = OAuth2Util.praw.AuthenticatedReddit.login(r, disable_warning=True)
-    sub = r.get_subreddit(subname)
+    
 
-    #Do Things
-    gather_data(r, sub)
-    process_submission_data()
-    process_comment_data()
-    submit_report(r)
+    #Run Once
+    #sub = r.get_subreddit(subname)
+    #gather_data(r, sub)
+    #process_submission_data()
+    #process_comment_data()
+    #submit_report(r)
+
+
+    #Loop
+    #for s in default_subs:
+    for s in subs:
+        
+        subname = s[0]
+        post_to_sub = s[1]
+        sub = r.get_subreddit(s[0])
+
+        print 'Running Report for ' + subname
+
+        try:
+            gather_data(r, sub)
+        except (Exception) as e:
+            print 'gather'
+            print e
+            
+        try:
+            process_submission_data()
+        except (Exception) as e:
+            print 'submissions'
+            print e
+            
+        try:
+            process_comment_data()
+        except (Exception) as e:
+            print 'comments'
+            print e
+
+        try:
+            submit_report(r)
+        except (Exception) as e:
+            print 'submit'
+            print e
+
+        reset_variables()
 
 
     return
@@ -60,7 +139,11 @@ def gather_data(r, sub):
     global gilded_comments
 
     #Gather submissions from the week
-    submissions = sub.get_top_from_week(limit=None)
+    epoch_today = time.time()
+    epoch_a_week_ago = epoch_today - 604800
+    search_string = 'timestamp:' + str(int(epoch_a_week_ago)) + '..' + str(int(epoch_today))
+    
+    submissions = sub.search(search_string, syntax='cloudsearch', limit=None)
 
     
     #Go through each submission
@@ -69,7 +152,7 @@ def gather_data(r, sub):
         try:
 
             #Disregard deleted or removed posts
-            if submission.author and submission.banned_by == None:
+            if submission.author:
 
                 submission_data_row = []
 
@@ -302,12 +385,54 @@ def submit_report(r):
     #Submit Report
     post_title = 'Weekly Report for /r/' + subname + ' - ' + str(time.strftime('%A, %B %d, %Y', time.gmtime()))
     r.submit(post_to_sub, post_title, text='\r\n\r\n'.join(report_text))
-    #r.submit('CHANGETHIS', post_title, text='\r\n\r\n'.join(report_text))
+    r.submit('WeeklyReport', post_title, text='\r\n\r\n'.join(report_text))
     
             
     return
 
 
+def reset_variables():
+
+    global subname
+    global post_to_sub
+
+    global submission_data
+    global top_submissions
+    global gilded_submissions
+    global submission_authors
+    global total_submission_count
+    global top_submission_authors
+    global total_submission_authors
+    
+    global comment_data
+    global top_comments
+    global gilded_comments
+    global comment_authors
+    global total_comment_count
+    global top_comment_authors
+    global total_comment_authors
+
+    subname = ''
+    post_to_sub = ''
+
+    submission_data = []
+    top_submissions = ['Score|Author|Post Title', ':---|:---|:---']
+    gilded_submissions = ['Score|Author|Post Title|Gilded', ':---|:---|:---|:---']
+    submission_authors = []
+    total_submission_count = 0
+    top_submission_authors = ['Author|Total Score|Submission Count|Submission Average', ':---|:---|:---|:---']
+    total_submission_authors = 0
+    
+    comment_data = []
+    top_comments = ['Score|Author|Comment', ':---|:---|:---']
+    gilded_comments = ['Score|Author|Comment|Gilded', ':---|:---|:---|:---']
+    comment_authors = []
+    total_comment_count = 0
+    top_comment_authors = ['Author|Total Score|Comment Count|Comment Average', ':---|:---|:---|:---']
+    total_comment_authors = 0
+
+
+    return
 
 
 Main()
