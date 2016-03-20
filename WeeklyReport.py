@@ -5,13 +5,25 @@ from operator import itemgetter
 
 
 #Variables to Change
-subs = [['photoshopbattles', 'battletalk'],
+subs = [
+            ['photoshopbattles', 'battletalk'],
+            ['cfb', 'korbendallas'],
+            ['Yogscast', 'Fonjask'],
             ['MilitaryGfys', 'korbendallas'],
-            ['Yogscast', 'Fonjask'], ['mma', 'xniklasx'],
-            ['OutOfTheLoop', 'korbendallas'], ['shouldibuythisgame', 'emnii'],
-            ['runescape', 'korbendallas'], ['2007scape', 'korbendallas'],
-            ['RSDarkscape', 'korbendallas'], ['drama', 'korbendallas'],
-            ['WarshipPorn', 'korbendallas']]
+            ['conspiracy', 'korbendallas'],
+            ['OutOfTheLoop', 'korbendallas'],
+            ['shouldibuythisgame', 'emnii'],
+            ['runescape', 'korbendallas'],
+            ['2007scape', 'korbendallas'],
+            ['RSDarkscape', 'korbendallas'],
+            ['drama', 'korbendallas'],
+            ['WarshipPorn', 'korbendallas'],
+            ['Overwatch', 'OverwatchMeta'],
+            ['mma', 'xniklasx'],
+            ['anxiety', 'korbendallas'],
+            ['femalehairadvice', 'korbendallas'],
+            ['sewing', 'korbendallas']
+            ]
 
 default_subs = [['Art', 'korbendallas'], ['AskReddit', 'korbendallas'],
             ['askscience', 'korbendallas'], ['aww', 'korbendallas'],
@@ -39,11 +51,11 @@ default_subs = [['Art', 'korbendallas'], ['AskReddit', 'korbendallas'],
             ['worldnews', 'korbendallas'], ['WritingPrompts']]
 
 
-subname = 'CHANGETHIS' #Current Subreddit
-post_to_sub = 'CHANGETHIS' #Subreddit to post report to
+subname = '' #Current Subreddit
+post_to_sub = '' #Subreddit to post report to
 
-username = 'CHANGETHIS'
-user_agent = 'CHANGETHIS'
+username = '_korbendallas_'
+user_agent = '_korbendallas_ by /u/_korbendallas_ ver 0.1'
 
 
 #Global Submission Variables
@@ -81,7 +93,7 @@ def Main():
     o = OAuth2Util.praw.AuthenticatedReddit.login(r, disable_warning=True)
     
 
-    #Run Once
+    #Run Once for Testing
     #sub = r.get_subreddit(subname)
     #gather_data(r, sub)
     #process_submission_data()
@@ -228,31 +240,48 @@ def process_submission_data():
 
     for submission_data_row in submission_data:
 
-        total_submission_count += 1
+        try:
+
+            total_submission_count = total_submission_count + 1
         
-        #Create Top 25 Submission Table
-        if len(top_submissions) < 28:
-            top_submissions.append(str(submission_data_row[3]) + '|' + str(submission_data_row[1]) + '|[' + submission_data_row[0] + '](' + submission_data_row[2] + ')')
+            #Create Top 25 Submission Table
+            if len(top_submissions) < 28:
+                top_submissions.append(str(submission_data_row[3]) + '|' + str(submission_data_row[1]) + '|[' + submission_data_row[0] + '](' + submission_data_row[2] + ')')
             
-        #Compile Top Submission Author Scores
-        if submission_authors:
-            if submission_data_row[1] in [submission_authors_row[1] for submission_authors_row in submission_authors]:
-                submission_authors[[submission_authors_row[1] for submission_authors_row in submission_authors].index(submission_data_row[1])][0] += submission_data_row[3]
-                submission_authors[[submission_authors_row[1] for submission_authors_row in submission_authors].index(submission_data_row[1])][2] += 1
+            #Compile Top Submission Author Scores
+            if submission_authors:
+                submission_author_exists = False
+                for submission_author in submission_authors:
+                    if submission_data_row[1] == submission_author[1]:
+                        submission_author[0] = submission_author[0] + submission_data_row[3]
+                        submission_author[2] = submission_author[2] + 1
+                        submission_author_exists = True
+                        break
+                if not submission_author_exists:
+                    submission_authors.append([submission_data_row[3], submission_data_row[1], 1])
             else:
                 submission_authors.append([submission_data_row[3], submission_data_row[1], 1])
-        else:
-            submission_authors.append([submission_data_row[3], submission_data_row[1], 1])
+                
+        except (Exception) as e:
+
+            print e
 
     #Compile Top Submission Author Table
     submission_authors = reversed(sorted(submission_authors, key=itemgetter(0)))
 
     for submission_author in submission_authors:
-        total_submission_authors += 1
-        if len(top_submission_authors) < 28:
-            top_submission_authors.append(submission_author[1] + '|' + str(submission_author[0]) + '|' + str(submission_author[2]) + '|' + str(int(float(submission_author[0]) / float(submission_author[2]))))
-        else:
-            break
+
+        try:
+            
+            total_submission_authors = total_submission_authors + 1
+            if len(top_submission_authors) < 28:
+                top_submission_authors.append(submission_author[1] + '|' + str(submission_author[0]) + '|' + str(submission_author[2]) + '|' + str(int(float(submission_author[0]) / float(submission_author[2]))))
+            else:
+                break
+        
+        except (Exception) as e:
+
+            print e
 
         
     return
@@ -273,30 +302,46 @@ def process_comment_data():
 
     for comment_data_row in comment_data:
 
-        total_comment_count += 1
+        try:
 
-        #Create Top 25 Comments Table
-        if len(top_comments) < 28:
-            top_comments.append(str(comment_data_row[1]) + '|' + str(comment_data_row[0]) + '|[' + comment_data_row[3] + '](' + comment_data_row[2] + '?context=1000)')
+            total_comment_count = total_comment_count + 1
 
-        #Compile Top Comment Author Scores
-        if comment_authors:
-            if comment_data_row[1] in [comment_authors_row[1] for comment_authors_row in comment_authors]:
-                comment_authors[[comment_authors_row[1] for comment_authors_row in comment_authors].index(comment_data_row[0])][0] += comment_data_row[1]
-                comment_authors[[comment_authors_row[1] for comment_authors_row in comment_authors].index(comment_data_row[0])][2] += 1
+            #Create Top 25 Comments Table
+            if len(top_comments) < 28:
+                top_comments.append(str(comment_data_row[1]) + '|' + str(comment_data_row[0]) + '|[' + comment_data_row[3] + '](' + comment_data_row[2] + '?context=1000)')
+
+            #Compile Top Comment Author Scores
+            if comment_authors:
+                comment_author_exists = False
+                for comment_author in comment_authors:
+                    if comment_data_row[1] == comment_author[1]:
+                        comment_author[0] = comment_author[0] + comment_data_row[3]
+                        comment_author[2] = comment_author[2] + 1
+                        comment_author_exists = True
+                        break
+                if not comment_author_exists:
+                    comment_authors.append([comment_data_row[3], comment_data_row[1], 1])
             else:
-                comment_authors.append([comment_data_row[1], comment_data_row[0], 1])
-        else:
-            comment_authors.append([comment_data_row[1], comment_data_row[0], 1])
+                comment_authors.append([comment_data_row[3], comment_data_row[1], 1])
+
+        except (Exception) as e:
+
+            print e
 
     #Compile Top Comment Author Table
     comment_authors = reversed(sorted(comment_authors, key=itemgetter(0)))
 
     for comment_author in comment_authors:
-        total_comment_authors += 1
-        if len(top_comment_authors) < 28:
-            top_comment_authors.append(comment_author[1] + '|' + str(comment_author[0]) + '|' + str(comment_author[2]) + '|' + str(int(float(comment_author[0]) / float(comment_author[2]))))
 
+        try:
+            
+            total_comment_authors = total_comment_authors + 1
+            if len(top_comment_authors) < 28:
+                top_comment_authors.append(str(comment_author[1]) + '|' + str(comment_author[0]) + '|' + str(comment_author[2]) + '|' + str(int(float(comment_author[0]) / float(comment_author[2]))))
+
+        except (Exception) as e:
+
+            print e
 
     return
     
@@ -324,68 +369,90 @@ def submit_report(r):
     global top_comment_authors
     global total_comment_authors
 
-
     report_text = ['#Weekly Report for /r/' + subname]
-    report_text.append(str(time.strftime('%A, %B %d, %Y', (datetime.datetime.now() + datetime.timedelta(days=-7)).timetuple())) + '  -  ' + str(time.strftime('%A, %B %d, %Y', time.gmtime())))
-    report_text.append('---')
 
-    report_text.append('---')
-    report_text.append('#Submissions')
-    report_text.append('---')
+    try:
+
+        report_text.append(str(time.strftime('%A, %B %d, %Y', (datetime.datetime.now() + datetime.timedelta(days=-7)).timetuple())) + '  -  ' + str(time.strftime('%A, %B %d, %Y', time.gmtime())))
+        report_text.append('---')
+
+        report_text.append('---')
+        report_text.append('#Submissions')
+        report_text.append('---')
     
-    report_text.append('---')
-    report_text.append('Total Submissions: ' + str(total_submission_count))
-    report_text.append('Total Submission Authors: ' + str(total_submission_authors))
-    report_text.append('---')
+        report_text.append('---')
+        report_text.append('Total Submissions: ' + str(total_submission_count))
+        report_text.append('Total Submission Authors: ' + str(total_submission_authors))
+        report_text.append('---')
 
-    report_text.append('##Top 25 Submissions')
-    report_text.append('\r\n'.join(top_submissions))
-    report_text.append('---')
+        report_text.append('##Top 25 Submissions')
+        report_text.append('\r\n'.join(top_submissions))
+        report_text.append('---')
 
-    report_text.append('##Top 25 Submitters')
-    report_text.append('\r\n'.join(top_submission_authors))
-    report_text.append('---')
+        report_text.append('##Top 25 Submitters')
+        report_text.append('\r\n'.join(top_submission_authors))
+        report_text.append('---')
 
-    report_text.append('---')
-    report_text.append(str(len(gilded_submissions) - 2) + ' Gilded Submissions')
-    if len(gilded_submissions) > 2:
-        report_text.append('\r\n'.join(gilded_submissions))
-    report_text.append('---')
+        report_text.append('---')
+        report_text.append(str(len(gilded_submissions) - 2) + ' Gilded Submissions')
+        if len(gilded_submissions) > 2:
+            report_text.append('\r\n'.join(gilded_submissions))
+        report_text.append('---')
 
 
-    report_text.append('---')
-    report_text.append('#Comments')
-    report_text.append('---')
+        report_text.append('---')
+        report_text.append('#Comments')
+        report_text.append('---')
     
-    report_text.append('---')
-    report_text.append('Total Comments: ' + str(total_comment_count))
-    report_text.append('Total Comment Authors: ' + str(total_comment_authors))
-    report_text.append('---')
+        report_text.append('---')
+        report_text.append('Total Comments: ' + str(total_comment_count))
+        report_text.append('Total Comment Authors: ' + str(total_comment_authors))
+        report_text.append('---')
     
-    report_text.append('##Top 25 Comments')
-    report_text.append('\r\n'.join(top_comments))
-    report_text.append('---')
+        report_text.append('##Top 25 Comments')
+        report_text.append('\r\n'.join(top_comments))
+        report_text.append('---')
 
-    report_text.append('##Top 25 Commenters')
-    report_text.append('\r\n'.join(top_comment_authors))
-    report_text.append('---')
+        report_text.append('##Top 25 Commenters')
+        report_text.append('\r\n'.join(top_comment_authors))
+        report_text.append('---')
 
-    report_text.append('---')
-    report_text.append(str(len(gilded_comments) - 2) + ' Gilded Comments')
-    if len(gilded_comments) > 2:
-        report_text.append('\r\n'.join(gilded_comments))
-    report_text.append('---')
+        report_text.append('---')
+        report_text.append(str(len(gilded_comments) - 2) + ' Gilded Comments')
+        if len(gilded_comments) > 2:
+            report_text.append('\r\n'.join(gilded_comments))
+        report_text.append('---')
     
     
-    report_text.append('---')
-    report_text.append('^(created by /u/_korbendallas_)')
-    report_text.append('---')
+        report_text.append('---')
+        report_text.append('^(created by /u/_korbendallas_)')
+        report_text.append('---')
+
+    except (Exception) as e:
+
+            print e
 
 
     #Submit Report
     post_title = 'Weekly Report for /r/' + subname + ' - ' + str(time.strftime('%A, %B %d, %Y', time.gmtime()))
-    r.submit(post_to_sub, post_title, text='\r\n\r\n'.join(report_text))
-    r.submit('WeeklyReport', post_title, text='\r\n\r\n'.join(report_text))
+
+    try:
+        
+        r.submit('WeeklyReport', post_title, text='\r\n\r\n'.join(report_text))
+        
+    except:
+        
+        print 'Error submitting post to WeeklyReport :', post_title
+
+    try:
+        
+        if not post_to_sub == 'korbendallas':
+            
+            r.submit(post_to_sub, post_title, text='\r\n\r\n'.join(report_text))
+            
+    except:
+        
+        print 'Error submitting post to', post_to_sub, ':', post_title
     
             
     return
