@@ -1,4 +1,4 @@
-import string, praw, OAuth2Util, time, datetime, locale
+import string, praw, OAuth2Util, time, datetime
 from operator import itemgetter
 
 
@@ -29,8 +29,8 @@ subs = [
 subname = '' #Current Subreddit
 post_to_sub = '' #Subreddit to post report to
 
-username = '' #!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!
-user_agent = '' #!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!
+username = '_korbendallas_'
+user_agent = '_korbendallas_'
 
 
 #Global Submission Variables
@@ -59,10 +59,9 @@ def Main():
     global subname
     global post_to_sub
     
-
     #Login
     r = praw.Reddit(user_agent)
-    o = OAuth2Util.praw.AuthenticatedReddit.login(r, disable_warning=True)
+    r.login('MYUSERNAME', 'MYPASSWORD', disable_warning=True)
 
 
     #Loop
@@ -77,41 +76,40 @@ def Main():
     return
 
 
-def run_report(r, subname, post_to_sub):
+def run_report(r):
 
     global subname
-    global post_to_sub
 
     sub = r.get_subreddit(subname)
 
-    print 'Running Report for ' + subname
+    print('Running Report for ' + subname)
 
     try:
         gather_data(r, sub)
     except (Exception) as e:
-        print 'gather'
-        print e
+        print('gather')
+        print(e)
         return
             
     try:
         process_submission_data()
     except (Exception) as e:
-        print 'submissions'
-        print e
+        print('submissions')
+        print(e)
         return
             
     try:
         process_comment_data()
     except (Exception) as e:
-        print 'comments'
-        print e
+        print('comments')
+        print(e)
         return
 
     try:
         submit_report(r)
     except (Exception) as e:
-        print 'submit'
-        print e
+        print('submit')
+        print(e)
         return
 
     reset_variables()
@@ -122,7 +120,7 @@ def run_report(r, subname, post_to_sub):
 
 def gather_data(r, sub):
 
-    print 'Gathering Data'
+    print('Gathering Data')
 
     global submission_data
     global gilded_submissions
@@ -193,11 +191,11 @@ def gather_data(r, sub):
 
                         except (Exception) as e:
 
-                            print e
+                            print(e)
 
         except (Exception) as e:
 
-            print e
+            print(e)
 
 
     return
@@ -205,7 +203,7 @@ def gather_data(r, sub):
 
 def process_submission_data():
 
-    print 'Processing Submissions'
+    print('Processing Submissions')
 
     global submission_data
     global top_submissions
@@ -243,7 +241,7 @@ def process_submission_data():
                 
         except (Exception) as e:
 
-            print e
+            print(e)
 
     #Compile Top Submission Author Table
     submission_authors = reversed(sorted(submission_authors, key=itemgetter(0)))
@@ -260,7 +258,7 @@ def process_submission_data():
         
         except (Exception) as e:
 
-            print e
+            print(e)
 
         
     return
@@ -268,7 +266,7 @@ def process_submission_data():
 
 def process_comment_data():
 
-    print 'Processing Comments'
+    print('Processing Comments')
 
     global comment_data
     global top_comments
@@ -305,7 +303,7 @@ def process_comment_data():
 
         except (Exception) as e:
 
-            print e
+            print(e)
 
     #Compile Top Comment Author Table
     comment_authors = reversed(sorted(comment_authors, key=itemgetter(0)))
@@ -320,14 +318,14 @@ def process_comment_data():
 
         except (Exception) as e:
 
-            print e
+            print(e)
 
     return
     
 
 def submit_report(r):
 
-    print 'Compiling and Submitting Report'
+    print('Compiling and Submitting Report')
 
     global subname
     global post_to_sub
@@ -409,7 +407,7 @@ def submit_report(r):
 
     except (Exception) as e:
 
-            print e
+            print(e)
 
 
     #Submit Report
@@ -421,7 +419,7 @@ def submit_report(r):
         
     except:
         
-        print 'Error submitting post to WeeklyReport :', post_title
+        print('Error submitting post to WeeklyReport :', post_title)
 
     try:
         
@@ -431,7 +429,7 @@ def submit_report(r):
             
     except:
         
-        print 'Error submitting post to', post_to_sub, ':', post_title
+        print('Error submitting post to', post_to_sub, ':', post_title)
     
             
     return
@@ -482,3 +480,6 @@ def reset_variables():
 
 
 Main()
+
+
+
