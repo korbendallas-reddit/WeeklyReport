@@ -56,8 +56,8 @@ default_subs = [
 subname = '' #Current Subreddit
 post_to_sub = '' #Subreddit to post report to
 
-username = '_korbendallas_'
-user_agent = '_korbendallas_ by /u/_korbendallas_ ver 0.1'
+username = '' #!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!
+user_agent = '' #!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 #Global Submission Variables
