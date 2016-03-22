@@ -1,4 +1,3 @@
-# -*- coding: cp1252 -*-
 import string, praw, OAuth2Util, time, datetime, locale
 from operator import itemgetter
 
@@ -6,49 +5,52 @@ from operator import itemgetter
 
 #Variables to Change
 subs = [
-            ['photoshopbattles', 'battletalk'],
-            ['cfb', 'korbendallas'],
-            ['Yogscast', 'Fonjask'],
-            ['MilitaryGfys', 'korbendallas'],
-            ['conspiracy', 'korbendallas'],
-            ['OutOfTheLoop', 'korbendallas'],
-            ['shouldibuythisgame', 'emnii'],
-            ['runescape', 'korbendallas'],
-            ['2007scape', 'korbendallas'],
-            ['RSDarkscape', 'korbendallas'],
-            ['drama', 'korbendallas'],
-            ['WarshipPorn', 'korbendallas'],
-            ['Overwatch', 'OverwatchMeta'],
-            ['mma', 'xniklasx'],
-            ['anxiety', 'korbendallas'],
-            ['femalehairadvice', 'korbendallas'],
-            ['sewing', 'korbendallas']
+            ['korbendallas', '']
+            #['photoshopbattles', 'battletalk'],
+            #['cfb', ''],
+            #['Yogscast', 'Fonjask'],
+            #['MilitaryGfys', ''],
+            #['conspiracy', ''],
+            #['OutOfTheLoop', ''],
+            #['shouldibuythisgame', 'emnii'],
+            #['runescape', ''],
+            #['2007scape', ''],
+            #['RSDarkscape', ''],
+            #['drama', ''],
+            #['WarshipPorn', ''],
+            #['Overwatch', 'OverwatchMeta'],
+            #['mma', 'xniklasx'],
+            #['anxiety', ''],
+            #['femalehairadvice', ''],
+            #['sewing', '']
             ]
 
-default_subs = [['Art', 'korbendallas'], ['AskReddit', 'korbendallas'],
-            ['askscience', 'korbendallas'], ['aww', 'korbendallas'],
-            ['books', 'korbendallas'], ['creepy', 'korbendallas'],
-            ['dataisbeautiful', 'korbendallas'], ['DIY', 'korbendallas'],
-            ['Documentaries', 'korbendallas'], ['EarthPorn', 'korbendallas'],
-            ['explainlikeimfive', 'korbendallas'], ['Fitness', 'korbendallas'],
-            ['food', 'korbendallas'], ['funny', 'korbendallas'],
-            ['Futurology', 'korbendallas'], ['gadgets', 'korbendallas'],
-            ['gaming', 'korbendallas'], ['GetMotivated', 'korbendallas'],
-            ['gifs', 'korbendallas'], ['history'],
-            ['IAmA', 'korbendallas'], ['InternetIsBeautiful', 'korbendallas'],
-            ['Jokes', 'korbendallas'], ['LifeProTips', 'korbendallas'],
-            ['listentothis', 'korbendallas'], ['mildlyinteresting', 'korbendallas'],
-            ['movies', 'korbendallas'], ['Music', 'korbendallas'],
-            ['news', 'korbendallas'], ['nosleep', 'korbendallas'],
-            ['nottheonion', 'korbendallas'], ['OldSchoolCool', 'korbendallas'],
-            ['personalfinance', 'korbendallas'], ['philosophy', 'korbendallas'],
-            ['photoshopbattles', 'korbendallas'], ['pics', 'korbendallas'],
-            ['science', 'korbendallas'], ['Showerthoughts', 'korbendallas'],
-            ['space', 'korbendallas'], ['sports', 'korbendallas'],
-            ['television', 'korbendallas'], ['tifu', 'korbendallas'],
-            ['todayilearned', 'korbendallas'], ['TwoXChromosomes', 'korbendallas'],
-            ['UpliftingNews', 'korbendallas'], ['videos', 'korbendallas'],
-            ['worldnews', 'korbendallas'], ['WritingPrompts']]
+default_subs = [
+            ['Art', ''], ['AskReddit', ''],
+            ['askscience', ''], ['aww', ''],
+            ['books', ''], ['creepy', ''],
+            ['dataisbeautiful', ''], ['DIY', ''],
+            ['Documentaries', ''], ['EarthPorn', ''],
+            ['explainlikeimfive', ''], ['Fitness', ''],
+            ['food', ''], ['funny', ''],
+            ['Futurology', ''], ['gadgets', ''],
+            ['gaming', ''], ['GetMotivated', ''],
+            ['gifs', ''], ['history', ''],
+            ['IAmA', ''], ['InternetIsBeautiful', ''],
+            ['Jokes', ''], ['LifeProTips', ''],
+            ['listentothis', ''], ['mildlyinteresting', ''],
+            ['movies', ''], ['Music', ''],
+            ['news', ''], ['nosleep', ''],
+            ['nottheonion', ''], ['OldSchoolCool', ''],
+            ['personalfinance', ''], ['philosophy', ''],
+            ['photoshopbattles', ''], ['pics', ''],
+            ['science', ''], ['Showerthoughts', ''],
+            ['space', ''], ['sports', ''],
+            ['television', ''], ['tifu', ''],
+            ['todayilearned', ''], ['TwoXChromosomes', ''],
+            ['UpliftingNews', ''], ['videos', ''],
+            ['worldnews', ''], ['WritingPrompts', '']
+            ]
 
 
 subname = '' #Current Subreddit
@@ -80,10 +82,7 @@ total_comment_authors = 0
     
 def Main():
 
-    locale.setlocale(locale.LC_ALL, '') #Python 2.x non-ascii
-
     global subs
-    global default_subs
     global subname
     global post_to_sub
     
@@ -91,53 +90,60 @@ def Main():
     #Login
     r = praw.Reddit(user_agent)
     o = OAuth2Util.praw.AuthenticatedReddit.login(r, disable_warning=True)
-    
-
-    #Run Once for Testing
-    #sub = r.get_subreddit(subname)
-    #gather_data(r, sub)
-    #process_submission_data()
-    #process_comment_data()
-    #submit_report(r)
 
 
     #Loop
-    #for s in default_subs:
     for s in subs:
-        
+
         subname = s[0]
         post_to_sub = s[1]
-        sub = r.get_subreddit(s[0])
 
-        print 'Running Report for ' + subname
+        run_report(r)
 
-        try:
-            gather_data(r, sub)
-        except (Exception) as e:
-            print 'gather'
-            print e
+
+    return
+
+
+def run_report(r, subname, post_to_sub):
+
+    global subname
+    global post_to_sub
+
+    sub = r.get_subreddit(subname)
+
+    print 'Running Report for ' + subname
+
+    try:
+        gather_data(r, sub)
+    except (Exception) as e:
+        print 'gather'
+        print e
+        return
             
-        try:
-            process_submission_data()
-        except (Exception) as e:
-            print 'submissions'
-            print e
+    try:
+        process_submission_data()
+    except (Exception) as e:
+        print 'submissions'
+        print e
+        return
             
-        try:
-            process_comment_data()
-        except (Exception) as e:
-            print 'comments'
-            print e
+    try:
+        process_comment_data()
+    except (Exception) as e:
+        print 'comments'
+        print e
+        return
 
-        try:
-            submit_report(r)
-        except (Exception) as e:
-            print 'submit'
-            print e
+    try:
+        submit_report(r)
+    except (Exception) as e:
+        print 'submit'
+        print e
+        return
 
-        reset_variables()
+    reset_variables()
 
-
+        
     return
 
 
@@ -446,7 +452,7 @@ def submit_report(r):
 
     try:
         
-        if not post_to_sub == 'korbendallas':
+        if not post_to_sub == '':
             
             r.submit(post_to_sub, post_title, text='\r\n\r\n'.join(report_text))
             
@@ -503,6 +509,3 @@ def reset_variables():
 
 
 Main()
-
-
-
