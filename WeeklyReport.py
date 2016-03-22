@@ -268,9 +268,9 @@ def process_comment_data():
 
     print('Processing Comments')
 
-    global comment_data
+    global comment_data#Comment_Author, Comment_Score, Comment_Link, Submission_Title
     global top_comments
-    global comment_authors
+    global comment_authors#Total_Score, Author, Count
     global total_comment_count
     global top_comment_authors
     global total_comment_authors
@@ -291,15 +291,15 @@ def process_comment_data():
             if comment_authors:
                 comment_author_exists = False
                 for comment_author in comment_authors:
-                    if comment_data_row[1] == comment_author[1]:
-                        comment_author[0] = comment_author[0] + comment_data_row[3]
+                    if comment_data_row[0] == comment_author[1]:
+                        comment_author[0] = comment_author[0] + comment_data_row[1]
                         comment_author[2] = comment_author[2] + 1
                         comment_author_exists = True
                         break
                 if not comment_author_exists:
-                    comment_authors.append([comment_data_row[3], comment_data_row[1], 1])
+                    comment_authors.append([comment_data_row[1], comment_data_row[0], 1])
             else:
-                comment_authors.append([comment_data_row[3], comment_data_row[1], 1])
+                comment_authors.append([comment_data_row[1], comment_data_row[0], 1])
 
         except (Exception) as e:
 
@@ -320,8 +320,8 @@ def process_comment_data():
 
             print(e)
 
-    return
-    
+    return    
+
 
 def submit_report(r):
 
