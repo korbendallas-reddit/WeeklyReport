@@ -5,32 +5,16 @@ from operator import itemgetter
 
 #Variables to Change
 subs = [
-            ['korbendallas', '']
-            #['photoshopbattles', 'battletalk'],
-            #['cfb', ''],
-            #['Yogscast', 'Fonjask'],
-            #['MilitaryGfys', ''],
-            #['conspiracy', ''],
-            #['OutOfTheLoop', ''],
-            #['shouldibuythisgame', 'emnii'],
-            #['runescape', ''],
-            #['2007scape', ''],
-            #['RSDarkscape', ''],
-            #['drama', ''],
-            #['WarshipPorn', ''],
-            #['Overwatch', 'OverwatchMeta'],
-            #['mma', 'xniklasx'],
-            #['anxiety', ''],
-            #['femalehairadvice', ''],
-            #['sewing', '']
+            ['sewing', 'sewingmods'],
+            ['anxiety', 'anxietymods']
             ]
 
 
 subname = '' #Current Subreddit
 post_to_sub = '' #Subreddit to post report to
 
-username = '_korbendallas_'
-user_agent = '_korbendallas_'
+username = 'MYUSERNAME'
+user_agent = 'MYUSERAGENT'
 
 
 #Global Submission Variables
@@ -89,6 +73,7 @@ def run_report(r):
     except (Exception) as e:
         print('gather')
         print(e)
+        reset_variables()
         return
             
     try:
@@ -96,6 +81,7 @@ def run_report(r):
     except (Exception) as e:
         print('submissions')
         print(e)
+        reset_variables()
         return
             
     try:
@@ -103,6 +89,7 @@ def run_report(r):
     except (Exception) as e:
         print('comments')
         print(e)
+        reset_variables()
         return
 
     try:
@@ -110,6 +97,7 @@ def run_report(r):
     except (Exception) as e:
         print('submit')
         print(e)
+        reset_variables()
         return
 
     reset_variables()
@@ -412,14 +400,6 @@ def submit_report(r):
 
     #Submit Report
     post_title = 'Weekly Report for /r/' + subname + ' - ' + str(time.strftime('%A, %B %d, %Y', time.gmtime()))
-
-    try:
-        
-        r.submit('WeeklyReport', post_title, text='\r\n\r\n'.join(report_text))
-        
-    except:
-        
-        print('Error submitting post to WeeklyReport :', post_title)
 
     try:
         
